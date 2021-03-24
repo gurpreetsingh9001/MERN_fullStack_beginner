@@ -1,17 +1,11 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import React, { Component } from 'react';   //React is a default export so we dont need {} around it but all other functions i.e objects are named export so we need {} 
+import ReactDOM from 'react-dom';           //  export default ClassName {....}  # default export        // export ClassName {....}  #named export
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 import '../node_modules/bootstrap/dist/css/bootstrap.css';
-import Counter from './components/counter';
 
 ReactDOM.render(
-  <Counter/>,
+  <App />,
   document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
