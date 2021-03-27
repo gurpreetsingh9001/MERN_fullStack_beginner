@@ -34,9 +34,9 @@ class App extends Component {
 
   //here we will only increment one counter so map/filter will not be helpful here,we need reference/index of that component from array
   handleIncrement = (counter) => {
-    const counters = [...this.state.counters]; //clone counters array  //exact copy
-    const index = counters.indexOf(counter);
-    counter[index] = { ...counter }; //increment works without this line but it is a no no to directly modify the state // and i dont know how it is functioning
+    const counters = [...this.state.counters]; //clone counters array of objects  //exact copy
+    const index = counters.indexOf(counter); // find index of our object in the array
+    counter[index] = { ...counter }; //clone the object in array increment works without this line but it is a no no to directly modify the state // and i dont know how it is functioning
     counters[index].value++;
     this.setState({ counters });
   };
