@@ -1,8 +1,25 @@
-const helmet = require('helmet');
-const Joi = require('joi-browser');
-const logger = require('./logger');
+//explore documentations of packages used here
+const startupDebugger = require('debug')('app:startup') //better than console.log  //second bracket is for namespace
+const dbDebugger = require('debug')('app:startup')  //if DEBUG=app:startup is set as env variable than all debug statement in that namespace will be shown, if no env variable no debug will be shown
+const config = require('config');    // for env configurations
+const helmet = require('helmet');    // secure http headers
+const Joi = require('joi-browser');   //validation
+const logger = require('./logger');   // seperate file to handle logging
 const express = require('express');
 const app = express();
+
+
+const posts = [
+    { id: 1, name: "jeff" },
+    { id: 2, name: "joe" },
+    { id: 3, name: "fin" },
+]
+
+// pug is a template engine for delivering dynamic html other than json // other than pug we have EJS,Mustache
+//see it in action in get request
+// view engines are not needed in restful services
+app.set('view engine', 'pug');
+app.set('views', './views');
 
 // adding a piece of middleware , then app.use for using it in request pipeline
 app.use(express.json());   //express.json() will unstringify to json  
@@ -11,6 +28,7 @@ app.use(express.static('public'));  //static files like css or images in public 
 
 //explore third party middlewares documentation at expressjs website like 'helmet','morgan'
 app.use(helmet);
+
 if (app.get('env') === 'development')         //enable it during development refrain in production //set env variable to change environment to staging prod etc  
     app.use(morgan('tiny'));            //logs the requests to console or log file  
 
@@ -23,17 +41,20 @@ app.use((req, res, next) => {
 //another middleware function in other file
 app.use(logger);
 
-const posts = [
-    { id: 1, name: "jeff" },
-    { id: 2, name: "joe" },
-    { id: 3, name: "fin" },
-]
+startupDebugger("startup");
+dbDebugger("database");
 
 
 app.get('/api/posts/:id/:name', (req, res) => {
     res.send(req.params.id);             // id and name are route paramenter and are generally used for required parameters
     res.send(req.query);            ///api/courses/:id?sortBy=name   query parameters are for optional values  // output ==> {sortBy:name}  ?? stored as key-value pairs 
 });
+
+//here we will return html markup to client with get request
+app.get('/', (req, res) => {
+    res.render('index', { title: "my express app", message: "hello" }); //first argument is name of view #name of our pug file //second arg has all dynamic values in the index.pug file
+});
+
 
 
 app.get('/api/posts', (req, res) => {

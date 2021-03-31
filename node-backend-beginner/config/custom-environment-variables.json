@@ -1,0 +1,10 @@
+{   
+    //comments not allowed in json
+    //"name":"my app name--development",
+    "mail":{
+        //"host":"dev mail server",     // we dont need host or name in this file because this file
+                            // do mapping of these variables with env variables and used generally 
+                            //during password or private info that should not be written on a file
+        "password":"app_password"
+    }
+}
