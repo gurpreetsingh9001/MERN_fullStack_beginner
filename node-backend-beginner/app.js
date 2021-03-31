@@ -1,8 +1,27 @@
+const helmet = require('helmet');
 const Joi = require('joi-browser');
+const logger = require('./logger');
 const express = require('express');
 const app = express();
 
-app.use(express.json());  // adding a piece of middleware , then app.use for using it in request pipeline
+// adding a piece of middleware , then app.use for using it in request pipeline
+app.use(express.json());   //express.json() will unstringify to json  
+app.use(express.urlencoded({ extended: true }));  // convert url encoded payload key=value&key=value to json body
+app.use(express.static('public'));  //static files like css or images in public folder // here like localhost:3000/readme.txt
+
+//explore third party middlewares documentation at expressjs website like 'helmet','morgan'
+app.use(helmet);
+if (app.get('env') === 'development')         //enable it during development refrain in production //set env variable to change environment to staging prod etc  
+    app.use(morgan('tiny'));            //logs the requests to console or log file  
+
+//creating a middleware function
+app.use((req, res, next) => {
+    console.log("Authenticating...");
+    next();   //pass control to next middleware function in pipleline
+});
+
+//another middleware function in other file
+app.use(logger);
 
 const posts = [
     { id: 1, name: "jeff" },
@@ -26,12 +45,6 @@ app.get('/api/post/:id', (req, res) => {              // this function is route 
     if (!post) return res.status(404).send("the post dont exist") //we should return 404 status if id is not found
     res.send(post);
 });
-
-//environment variable PORT   // set PORT=5000 (in terminal) # assigning a port to node app
-//global object process
-const port = process.env.PORT || 9000;
-app.listen(port, () => { console.log('listening on port ' + port) });
-
 
 
 app.post('/api/posts', (req, res) => {
@@ -79,3 +92,10 @@ function validatePost(post) {
     };
     return Joi.validate(post, schema);
 }
+
+// set PORT=5000 (in terminal) # assigning a port to node app
+// set NODE_ENV='staging' #assigning current environment -- development(default),production
+//environment variable PORT   
+//global object process
+const port = process.env.PORT || 9000;
+app.listen(port, () => { console.log('listening on port ' + port) });

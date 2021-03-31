@@ -1,8 +1,7 @@
 
-var url = "";
+function log(req, res, next) {
+    console.log("Logging...");
+    next();
+};
 
-function log(message) {
-    console.log("jell");
-}
-
-module.export.log = log;
+module.export = log;
