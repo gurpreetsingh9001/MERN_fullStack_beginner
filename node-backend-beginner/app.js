@@ -4,7 +4,8 @@ const dbDebugger = require('debug')('app:startup')  //if DEBUG=app:startup is se
 const config = require('config');    // for env configurations
 const helmet = require('helmet');    // secure http headers
 const Joi = require('joi-browser');   //validation
-const logger = require('./logger');   // seperate file to handle logging
+const logger = require('./middleware/logger');   // seperate file to handle logging
+const coursed = require('./route/courses');
 const express = require('express');
 const app = express();
 
@@ -21,29 +22,29 @@ const posts = [
 app.set('view engine', 'pug');
 app.set('views', './views');
 
+
 // adding a piece of middleware , then app.use for using it in request pipeline
 app.use(express.json());   //express.json() will unstringify to json  
-app.use(express.urlencoded({ extended: true }));  // convert url encoded payload key=value&key=value to json body
-app.use(express.static('public'));  //static files like css or images in public folder // here like localhost:3000/readme.txt
-
-//explore third party middlewares documentation at expressjs website like 'helmet','morgan'
-app.use(helmet);
-
-if (app.get('env') === 'development')         //enable it during development refrain in production //set env variable to change environment to staging prod etc  
-    app.use(morgan('tiny'));            //logs the requests to console or log file  
-
 //creating a middleware function
 app.use((req, res, next) => {
     console.log("Authenticating...");
     next();   //pass control to next middleware function in pipleline
 });
-
 //another middleware function in other file
 app.use(logger);
+app.use(express.urlencoded({ extended: true }));  // convert url encoded payload key=value&key=value to json body
+app.use(express.static('public'));  //static files like css or images in public folder // here like localhost:3000/readme.txt
+//explore third party middlewares documentation at expressjs website like 'helmet','morgan'
+app.use(helmet);
+app.use('/api/courses', courses) //we are telling express that for any route that start with '/api/courses' use 'courses' router and hence we can just reduce '/api/courses' in our courses file unlike posts
 
 startupDebugger("startup");
 dbDebugger("database");
 
+
+
+if (app.get('env') === 'development')         //enable it during development refrain in production //set env variable to change environment to staging prod etc  
+    app.use(morgan('tiny'));            //logs the requests to console or log file  
 
 app.get('/api/posts/:id/:name', (req, res) => {
     res.send(req.params.id);             // id and name are route paramenter and are generally used for required parameters
@@ -61,7 +62,7 @@ app.get('/api/posts', (req, res) => {
     res.send(posts);
 });
 
-app.get('/api/post/:id', (req, res) => {              // this function is route handler function
+app.get('/api/posts/:id', (req, res) => {              // this function is route handler function
     const post = posts.find(p => p.id === parseInt(req.params.id));   // in get method we are using params in post and put we use body of payload recieved
     if (!post) return res.status(404).send("the post dont exist") //we should return 404 status if id is not found
     res.send(post);
@@ -96,7 +97,7 @@ app.put('/api/posts/:id', (req, res) => {
     res.send(post);
 });
 
-app.delete('/api/delete/:id', (req, res) => {
+app.delete('/api/posts/:id', (req, res) => {
     const post = posts.find(p => p.id === parseInt(req.params.id));
     if (!post) return res.status(404).send("post not found");
 
