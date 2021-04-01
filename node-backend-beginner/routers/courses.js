@@ -20,7 +20,7 @@ router.get('/api/courses/:id', (req, res) => {
 });
 
 
-router.course('/', (req, res) => {
+router.post('/', (req, res) => {
     const { error } = validatecourse(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);

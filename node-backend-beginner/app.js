@@ -5,7 +5,7 @@ const config = require('config');    // for env configurations
 const helmet = require('helmet');    // secure http headers
 const Joi = require('joi-browser');   //validation
 const logger = require('./middleware/logger');   // seperate file to handle logging
-const coursed = require('./route/courses');
+const courses = require('./route/courses');
 const express = require('express');
 const app = express();
 
@@ -32,11 +32,11 @@ app.use((req, res, next) => {
 });
 //another middleware function in other file
 app.use(logger);
-app.use(express.urlencoded({ extended: true }));  // convert url encoded payload key=value&key=value to json body
+app.use(express.urlencoded({ extended: true }));  // convert url encoded payload key=value&key=value to json in the header of request
 app.use(express.static('public'));  //static files like css or images in public folder // here like localhost:3000/readme.txt
 //explore third party middlewares documentation at expressjs website like 'helmet','morgan'
 app.use(helmet);
-app.use('/api/courses', courses) //we are telling express that for any route that start with '/api/courses' use 'courses' router and hence we can just reduce '/api/courses' in our courses file unlike posts
+app.use('/api/courses', courses); //we are telling express that for any route that start with '/api/courses' use 'courses' router and hence we can just reduce '/api/courses' in our courses file unlike posts
 
 startupDebugger("startup");
 dbDebugger("database");
@@ -107,12 +107,12 @@ app.delete('/api/posts/:id', (req, res) => {
     res.send(post);
 });
 
-
+//syntax changed in new version
 function validatePost(post) {
-    const schema = {
+    const schema = Joi.object({
         name: Joi.string().min(3).required()
-    };
-    return Joi.validate(post, schema);
+    });
+    return schema.validate(post);
 }
 
 // set PORT=5000 (in terminal) # assigning a port to node app
